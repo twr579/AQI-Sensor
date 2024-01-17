@@ -1,18 +1,21 @@
-#include <Arduino.h>
+#include "Bme680.h"
+#include <ArduinoJson.h>
 
-// put function declarations here:
-int myFunction(int, int);
-
-void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+void setup()
+{
+  /* Initializes the Serial communication */
+  Serial.begin(115200);
+  delay(1000);
+  pinMode(LED_BUILTIN, OUTPUT);
+  setupBme680();
 }
 
-void loop() {
-  // put your main code here, to run repeatedly:
-}
-
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+void loop()
+{
+  JsonDocument doc;
+  runBme680(doc);
+  if (!doc.isNull())
+  {
+    serializeJson(doc, Serial);
+  }
 }
