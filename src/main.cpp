@@ -1,4 +1,5 @@
 #include "Bme680.h"
+#include "AWS.h"
 #include <ArduinoJson.h>
 
 void setup()
@@ -7,15 +8,18 @@ void setup()
   Serial.begin(115200);
   delay(1000);
   pinMode(LED_BUILTIN, OUTPUT);
+  setupAWS();
   setupBme680();
 }
 
 void loop()
 {
   JsonDocument doc;
+
   runBme680(doc);
+
   if (!doc.isNull())
   {
-    serializeJson(doc, Serial);
+    publish(doc);
   }
 }

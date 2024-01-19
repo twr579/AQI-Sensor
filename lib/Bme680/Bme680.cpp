@@ -4,14 +4,6 @@
 
 #include "Bme680.h"
 
-// JSON key names definitions
-#define IAQ "IAQ"
-#define CO2 "CO2"
-#define VOC "VOC"
-#define PRESSURE "pressure"
-#define TEMPERATURE "temperature"
-#define HUMIDITY "humidity"
-
 // Create an object of the class Bsec
 Bsec bme680;
 
@@ -34,35 +26,24 @@ void setupBme680()
     bme680.updateSubscription(sensorList, 6, BSEC_SAMPLE_RATE_LP);
     checkSensorStatus();
 
-    // Print the header
-    output = "Timestamp [ms], IAQ, IAQ accuracy, CO2 equivalent, breath VOC equivalent, pressure [hPa], comp temp[°C], comp humidity [%]";
-    Serial.println(output);
+    Serial.println("Sensor warming up");
+    while (!bme680.iaqAccuracy)
+    {
+        bme680.run();
+    };
+    Serial.println("Sensor warmed up");
 }
 
 void runBme680(JsonDocument &doc)
 {
     if (bme680.run())
     { // If new data is available
-        digitalWrite(LED_BUILTIN, LOW);
-        output = String(bme680.iaq);
-        output += ", " + String(bme680.iaqAccuracy);
-        output += ", " + String(bme680.co2Equivalent);
-        output += ", " + String(bme680.breathVocEquivalent);
-        output += ", " + String(bme680.pressure);
-        output += ", " + String(bme680.temperature);
-        output += ", " + String(bme680.humidity);
-        Serial.println(output);
-        digitalWrite(LED_BUILTIN, HIGH);
-
-        if (bme680.iaqAccuracy)
-        { // If sensor data is accurate, populate a JsonDocument to publish to DynamoDB
-            doc[IAQ] = String(bme680.iaq);
-            doc[CO2] = String(bme680.co2Equivalent);
-            doc[VOC] = String(bme680.breathVocEquivalent);
-            doc[PRESSURE] = String(bme680.pressure);
-            doc[TEMPERATURE] = String(bme680.temperature);
-            doc[HUMIDITY] = String(bme680.humidity);
-        }
+        doc[IAQ] = String(bme680.iaq);
+        doc[CO2] = String(bme680.co2Equivalent);
+        doc[VOC] = String(bme680.breathVocEquivalent);
+        doc[PRESSURE] = String(bme680.pressure);
+        doc[TEMPERATURE] = String(bme680.temperature);
+        doc[HUMIDITY] = String(bme680.humidity);
     }
     else
     {

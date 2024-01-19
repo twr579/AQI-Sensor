@@ -5,6 +5,14 @@
 #include "bsec.h"
 #include <ArduinoJson.h>
 
+// JSON key names definitions
+#define IAQ "IAQ"
+#define CO2 "CO2"
+#define VOC "VOC"
+#define PRESSURE "pressure"
+#define TEMPERATURE "temperature"
+#define HUMIDITY "humidity"
+
 // Initializes the BME680 sensor for use
 void setupBme680();
 
