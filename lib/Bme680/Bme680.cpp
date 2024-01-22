@@ -7,8 +7,6 @@
 // Create an object of the class Bsec
 Bsec bme680;
 
-String output;
-
 void setupBme680()
 {
     bme680.begin(BME68X_I2C_ADDR_HIGH, Wire);
@@ -53,17 +51,17 @@ void runBme680(JsonDocument &doc)
 
 void checkSensorStatus()
 {
+    String errorStr = "BSEC error code: ";
+    String warningStr = "BSEC warning code: ";
     if (bme680.bsecStatus != BSEC_OK)
     {
         if (bme680.bsecStatus < BSEC_OK)
         {
-            output = "BSEC error code : " + String(bme680.bsecStatus);
-            Serial.println(output);
+            Serial.println(errorStr + bme680.bsecStatus);
         }
         else
         {
-            output = "BSEC warning code : " + String(bme680.bsecStatus);
-            Serial.println(output);
+            Serial.println(warningStr + bme680.bsecStatus);
         }
     }
 
@@ -71,13 +69,11 @@ void checkSensorStatus()
     {
         if (bme680.bme68xStatus < BME68X_OK)
         {
-            output = "BME68X error code : " + String(bme680.bme68xStatus);
-            Serial.println(output);
+            Serial.println(errorStr + bme680.bme68xStatus);
         }
         else
         {
-            output = "BME68X warning code : " + String(bme680.bme68xStatus);
-            Serial.println(output);
+            Serial.println(warningStr + bme680.bme68xStatus);
         }
     }
 }

@@ -6,7 +6,6 @@
 
 WiFiClientSecure net = WiFiClientSecure();
 PubSubClient client(net);
-long lastMsg = 0;
 bool ledState = LOW;
 
 void setupAWS()
@@ -60,15 +59,11 @@ void publish(JsonDocument &doc)
     else
     {
         client.loop();
-        if (millis() - lastMsg > 5000)
-        {
-            lastMsg = millis();
-            char jsonBuffer[512];
-            serializeJson(doc, jsonBuffer);
-            Serial.println("Publishing: " + String(jsonBuffer));
-            ledState = ledState == LOW ? HIGH : LOW;
-            digitalWrite(LED_BUILTIN, ledState);
-            client.publish(AWS_IOT_PUBLISH_TOPIC, jsonBuffer);
-        }
+        char jsonBuffer[512];
+        serializeJson(doc, jsonBuffer);
+        Serial.println("Publishing: " + String(jsonBuffer));
+        ledState = ledState == LOW ? HIGH : LOW;
+        digitalWrite(LED_BUILTIN, ledState);
+        client.publish(AWS_IOT_PUBLISH_TOPIC, jsonBuffer);
     }
 }
