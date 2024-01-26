@@ -1,12 +1,7 @@
-#include "Bme680.h"
-#include "AWS.h"
-#include "GPS.h"
-#include <ArduinoJson.h>
+#include <Arduino.h>
+#include "AQIClient.h"
 
-#define TIME_BETWEEN_READS 5000
-#define LOCATION "location"
-
-unsigned long lastTime = 0;
+AQIClient aqiClient;
 
 void setup()
 {
@@ -14,20 +9,10 @@ void setup()
   Serial.begin(115200);
   Serial2.begin(9600);
   pinMode(LED_BUILTIN, OUTPUT);
-  setupBme680();
-  setupGPS();
-  setupAWS();
+  aqiClient.begin();
 }
 
 void loop()
 {
-  if ((millis() - lastTime) > TIME_BETWEEN_READS)
-  {
-    JsonDocument doc;
-    JsonObject location = doc[LOCATION].to<JsonObject>();
-    runBme680(doc);
-    runGPS(location);
-    publish(doc);
-    lastTime = millis();
-  }
+  aqiClient.run();
 }

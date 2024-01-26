@@ -1,28 +1,36 @@
 /**
- * Bme680.h - BME680 library routines
+ * BME680.h - BME680 class definition
  */
 
 #include "bsec.h"
-#include <ArduinoJson.h>
+#include "AbstractSensor.hpp"
 
-// JSON key names definitions
-#define IAQ "IAQ"
-#define CO2 "CO2"
-#define VOC "VOC"
-#define PRESSURE "pressure"
-#define TEMPERATURE "temperature"
-#define HUMIDITY "humidity"
-
-// Initializes the BME680 sensor for use
-void setupBme680();
+struct BME680Data
+{
+    float iaq;
+    float co2;
+    float voc;
+    float pressure;
+    float temperature;
+    float humidity;
+};
 
 /**
- * Reads data from the sensor, and if the data is new and accurate (i.e. sensor has warmed up),
- * populates a JsonDocument with relevant sensor data to publish to DynamoDB.
- *
- * @param[out] doc a reference to a JsonDocument containing sensor data
+ * Initialize, run, and store data for the BME680 sensor
  */
-void runBme680(JsonDocument &doc);
+class BME680 : public AbstractSensor<BME680Data>
+{
+public:
+    // Initialize the BME680
+    void begin();
 
-// Checks for error or warning codes if the sensor is not running properly
-void checkSensorStatus();
+    // Run the BME680
+    void run();
+
+private:
+    // Bsec object for collecting data from the sensor
+    Bsec bsec;
+
+    // Check if the bsec object has any error or warning codes
+    void checkStatus();
+};

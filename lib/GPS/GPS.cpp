@@ -1,15 +1,15 @@
 /**
- * GPS.cpp - GPS library routines
+ * GPS.cpp - GPS class methods
  */
 
 #include "GPS.h"
 
-TinyGPSPlus gps;
-
-void setupGPS()
+void GPS::begin()
 {
     Serial.println("Establishing GPS connection");
     bool hasFix = false;
+
+    // Wait for the GPS to process a valid location
     while (!hasFix)
     {
         while (Serial2.available() > 0)
@@ -22,11 +22,13 @@ void setupGPS()
                 }
             }
         }
+
+        checkStatus();
     }
     Serial.println("GPS connection established");
 }
 
-void runGPS(JsonObject &obj)
+void GPS::run()
 {
     while (Serial2.available() > 0)
     {
@@ -34,9 +36,20 @@ void runGPS(JsonObject &obj)
         {
             if (gps.location.isValid())
             {
-                obj[LATITUDE] = gps.location.lat();
-                obj[LONGITUDE] = gps.location.lng();
+                setData({.lat = gps.location.lat(), .lng = gps.location.lng()});
+            }
+            else
+            {
+                Serial.println("Invalid location");
             }
         }
     }
+
+    checkStatus();
+}
+
+void GPS::checkStatus()
+{
+    if (millis() > 5000 && gps.charsProcessed() < 10)
+        Serial.println("No GPS data received: check wiring");
 }

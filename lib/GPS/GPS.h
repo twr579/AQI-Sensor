@@ -1,20 +1,32 @@
 /**
- * GPS.h - GPS library routines
+ * GPS.h - GPS class definition
  */
 
 #include <TinyGPS++.h>
-#include <ArduinoJson.h>
+#include "AbstractSensor.hpp"
 
-// JSON key names definitions
-#define LATITUDE "lat"
-#define LONGITUDE "lng"
-
-// Initializes the GPS for use
-void setupGPS();
+struct GPSData
+{
+    double lat;
+    double lng;
+};
 
 /**
- * Reads data from the GPS and populates a JsonObject with relevant GPS data to publish to DynamoDB.
- *
- * @param[out] obj a reference to a JsonObject containing GPS data
+ * Initialize, run, and store data for the NEO-6M GPS module
  */
-void runGPS(JsonObject &obj);
+class GPS : public AbstractSensor<GPSData>
+{
+public:
+    // Initialize the GPS
+    void begin();
+
+    // Run the GPS
+    void run();
+
+private:
+    // TinyGPSPlus object for collecting data from the GPS module
+    TinyGPSPlus gps;
+
+    // Check if the GPS is connected
+    void checkStatus();
+};

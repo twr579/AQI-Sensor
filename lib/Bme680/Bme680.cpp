@@ -1,16 +1,13 @@
 /**
- * Bme680.cpp - BME680 library routines
+ * BME680.cpp - BME680 class methods
  */
 
-#include "Bme680.h"
+#include "BME680.h"
 
-// Create an object of the class Bsec
-Bsec bme680;
-
-void setupBme680()
+void BME680::begin()
 {
-    bme680.begin(BME68X_I2C_ADDR_HIGH, Wire);
-    checkSensorStatus();
+    bsec.begin(BME68X_I2C_ADDR_HIGH, Wire);
+    checkStatus();
 
     bsec_virtual_sensor_t sensorList[6] = {
         BSEC_OUTPUT_IAQ,
@@ -21,59 +18,64 @@ void setupBme680()
         BSEC_OUTPUT_SENSOR_HEAT_COMPENSATED_HUMIDITY,
     };
 
-    bme680.updateSubscription(sensorList, 6, BSEC_SAMPLE_RATE_LP);
-    checkSensorStatus();
+    bsec.updateSubscription(sensorList, 6, BSEC_SAMPLE_RATE_LP);
+    checkStatus();
 
     Serial.println("Sensor warming up");
-    while (!bme680.iaqAccuracy)
+
+    // Run the sensor until it is calibrated
+    while (!bsec.iaqAccuracy)
     {
-        bme680.run();
+        bsec.run();
     };
+
     Serial.println("Sensor warmed up");
 }
 
-void runBme680(JsonDocument &doc)
+void BME680::run()
 {
-    if (bme680.run())
+    if (bsec.run())
     { // If new data is available
-        doc[IAQ] = String(bme680.iaq);
-        doc[CO2] = String(bme680.co2Equivalent);
-        doc[VOC] = String(bme680.breathVocEquivalent);
-        doc[PRESSURE] = String(bme680.pressure);
-        doc[TEMPERATURE] = String(bme680.temperature);
-        doc[HUMIDITY] = String(bme680.humidity);
+        setData({
+            .iaq = bsec.iaq,
+            .co2 = bsec.co2Equivalent,
+            .voc = bsec.breathVocEquivalent,
+            .pressure = bsec.pressure,
+            .temperature = bsec.temperature,
+            .humidity = bsec.humidity,
+        });
     }
     else
     {
-        checkSensorStatus();
+        checkStatus();
     }
 }
 
-void checkSensorStatus()
+void BME680::checkStatus()
 {
     String errorStr = "BSEC error code: ";
     String warningStr = "BSEC warning code: ";
-    if (bme680.bsecStatus != BSEC_OK)
+    if (bsec.bsecStatus != BSEC_OK)
     {
-        if (bme680.bsecStatus < BSEC_OK)
+        if (bsec.bsecStatus < BSEC_OK)
         {
-            Serial.println(errorStr + bme680.bsecStatus);
+            Serial.println(errorStr + bsec.bsecStatus);
         }
         else
         {
-            Serial.println(warningStr + bme680.bsecStatus);
+            Serial.println(warningStr + bsec.bsecStatus);
         }
     }
 
-    if (bme680.bme68xStatus != BME68X_OK)
+    if (bsec.bme68xStatus != BME68X_OK)
     {
-        if (bme680.bme68xStatus < BME68X_OK)
+        if (bsec.bme68xStatus < BME68X_OK)
         {
-            Serial.println(errorStr + bme680.bme68xStatus);
+            Serial.println(errorStr + bsec.bme68xStatus);
         }
         else
         {
-            Serial.println(warningStr + bme680.bme68xStatus);
+            Serial.println(warningStr + bsec.bme68xStatus);
         }
     }
 }
