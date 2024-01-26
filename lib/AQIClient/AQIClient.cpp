@@ -38,6 +38,12 @@ void AQIClient::begin()
     // Connect to PubSubClient
     client.setServer(AWS_IOT_ENDPOINT, 8883);
     connect();
+
+    // Generate a unique UUID for this instance of the AQIClient
+    uint32_t seed1 = random(999999999);
+    uint32_t seed2 = random(999999999);
+    id.seed(seed1, seed2);
+    id.generate();
 }
 
 void AQIClient::run()
@@ -83,6 +89,8 @@ void AQIClient::connect()
 void AQIClient::publish()
 {
     JsonDocument doc;
+
+    doc[ID] = id;
 
     BME680Data bme680Data = bme680.getData();
     doc[IAQ] = bme680Data.iaq;

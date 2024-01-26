@@ -9,11 +9,13 @@
 #include <ArduinoJson.h>
 #include "BME680.h"
 #include "GPS.h"
+#include "UUID.h"
 
 #define AWS_IOT_PUBLISH_TOPIC "esp32/pub"
 #define TIME_BETWEEN_PUBLISHES 5000
 
 // JSON key names
+#define ID "id"
 #define IAQ "iaq"
 #define CO2 "co2"
 #define VOC "voc"
@@ -48,6 +50,7 @@ private:
     WiFiClientSecure net;
     PubSubClient client;
     unsigned long lastTime;
+    UUID id;
 
     // Connect the PubSubClient to AWS IoT Core thing
     void connect();
