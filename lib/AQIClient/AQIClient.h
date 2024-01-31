@@ -12,7 +12,7 @@
 #include "UUID.h"
 
 #define AWS_IOT_PUBLISH_TOPIC "esp32/pub"
-#define TIME_BETWEEN_PUBLISHES 5000
+#define TIME_BETWEEN_PUBLISHES 30000
 
 // JSON key names
 #define ID "id"

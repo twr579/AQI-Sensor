@@ -13,10 +13,6 @@ AQIClient::AQIClient()
 
 void AQIClient::begin()
 {
-    // Initialize the sensors
-    bme680.begin();
-    gps.begin();
-
     // Initialize WiFi and WiFiClient
     WiFi.mode(WIFI_STA);
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
@@ -30,6 +26,10 @@ void AQIClient::begin()
     }
 
     Serial.println("Connected to the WiFi network");
+
+    // Initialize the sensors
+    bme680.begin();
+    gps.begin();
 
     net.setCACert(AWS_CERT_CA);
     net.setCertificate(AWS_CERT_CRT);
@@ -59,10 +59,12 @@ void AQIClient::run()
     else
     {
         client.loop();
-        if ((millis() - lastTime) > TIME_BETWEEN_PUBLISHES)
-        { // Publish sensor data every 5 seconds
+        if ((millis() - lastTime) > TIME_BETWEEN_PUBLISHES && bme680.isValid() && gps.isValid())
+        { // Publish sensor data every 30 seconds
             lastTime = millis();
             publish();
+            bme680.clear();
+            gps.clear();
         }
     }
 }

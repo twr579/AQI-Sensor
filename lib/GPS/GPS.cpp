@@ -41,6 +41,7 @@ void GPS::run()
             else
             {
                 Serial.println("Invalid location");
+                clear();
             }
         }
     }
@@ -51,5 +52,8 @@ void GPS::run()
 void GPS::checkStatus()
 {
     if (millis() > 5000 && gps.charsProcessed() < 10)
+    {
         Serial.println("No GPS data received: check wiring");
+        clear();
+    }
 }

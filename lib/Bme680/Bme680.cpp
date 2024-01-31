@@ -57,6 +57,7 @@ void BME680::checkStatus()
     String warningStr = "BSEC warning code: ";
     if (bsec.bsecStatus != BSEC_OK)
     {
+        clear();
         if (bsec.bsecStatus < BSEC_OK)
         {
             Serial.println(errorStr + bsec.bsecStatus);
@@ -69,6 +70,7 @@ void BME680::checkStatus()
 
     if (bsec.bme68xStatus != BME68X_OK)
     {
+        clear();
         if (bsec.bme68xStatus < BME68X_OK)
         {
             Serial.println(errorStr + bsec.bme68xStatus);
